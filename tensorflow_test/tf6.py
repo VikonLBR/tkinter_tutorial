@@ -11,7 +11,7 @@ def add_layer(inputs, input_size, output_size, activation_function=None):
         outputs = Wx_plus_b
     else:
         outputs = activation_function(Wx_plus_b)
-    return  outputs
+    return outputs
 
 
 x_data = np.linspace(-1, 1, 300)[:, np.newaxis] #300行， 只有一个输入单元，算作只有一个输入神经元
@@ -50,6 +50,12 @@ prediction = add_layer(l1, 10, 1, activation_function=None)
 
 loss = tf.reduce_mean(tf.reduce_sum(tf.square(ys-prediction),
                      reduction_indices=[1]))
+"""
+
+reduce_sum() 就是求和，由于求和的对象是tensor，所以是沿着tensor的某些维度求和。
+reduction_indices是指沿tensor的哪些维度求和。
+
+"""
 
 
 #start training
@@ -60,10 +66,27 @@ with tf.Session() as sess:#Session后面需要加括号
 
     init_op = tf.global_variables_initializer()
     sess.run(init_op)
-    for i in range(1000):
+    figure = plt.figure()
+    ax = figure.add_subplot(1, 1, 1)
+    ax.scatter(x_data, y_data)
+    plt.ion()
+    plt.show()
+    for i in range(10000):
+
         sess.run(train_step, feed_dict={xs: x_data, ys: y_data})
-        if i % 50 == 0:
+        if i % 1000 == 0:
             print(sess.run(loss, feed_dict={xs: x_data, ys: y_data}))
+            try:
+                ax.lines.remove(line[0])
+            except Exception:
+                pass
+            pre_value = sess.run(prediction, feed_dict={xs:x_data})
+            line = ax.plot(x_data, pre_value, 'r-', lw=5)
+            plt.pause(0.5)
+
+
+
+
 
 
 
